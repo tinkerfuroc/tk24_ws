@@ -1,0 +1,42 @@
+[0.004s] Invoking command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/wbc/Projects/tinker_git_repo/tk23_ws/src/tinker_description -DCMAKE_INSTALL_PREFIX=/home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description
+[0.065s] -- The C compiler identification is GNU 11.3.0
+[0.106s] -- The CXX compiler identification is GNU 11.3.0
+[0.112s] -- Detecting C compiler ABI info
+[0.142s] -- Detecting C compiler ABI info - done
+[0.146s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.146s] -- Detecting C compile features
+[0.146s] -- Detecting C compile features - done
+[0.148s] -- Detecting CXX compiler ABI info
+[0.181s] -- Detecting CXX compiler ABI info - done
+[0.184s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.184s] -- Detecting CXX compile features
+[0.185s] -- Detecting CXX compile features - done
+[0.186s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.342s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.6") found components: Interpreter 
+[0.389s] -- Found ament_lint_auto: 0.12.6 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.426s] -- Added test 'lint_cmake' to check CMake code style
+[0.427s] -- Added test 'xmllint' to check XML markup files
+[0.428s] -- Configuring done
+[0.429s] -- Generating done
+[0.429s] -- Build files have been written to: /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description
+[0.432s] Invoked command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/wbc/Projects/tinker_git_repo/tk23_ws/src/tinker_description -DCMAKE_INSTALL_PREFIX=/home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description
+[0.432s] Invoking command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description -- -j24 -l24
+[0.446s] Invoked command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description -- -j24 -l24
+[0.457s] Invoking command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description
+[0.460s] -- Install configuration: ""
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/package_run_dependencies/tinker_description
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/parent_prefix_path/tinker_description
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/ament_prefix_path.sh
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/ament_prefix_path.dsv
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/path.sh
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/path.dsv
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.bash
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.sh
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.zsh
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.dsv
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/package.dsv
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/packages/tinker_description
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/cmake/tinker_descriptionConfig.cmake
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/cmake/tinker_descriptionConfig-version.cmake
+[0.460s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/package.xml
+[0.461s] Invoked command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description

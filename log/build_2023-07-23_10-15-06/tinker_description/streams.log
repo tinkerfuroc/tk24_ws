@@ -1,0 +1,29 @@
+[0.005s] Invoking command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description -- -j24 -l24
+[0.020s] Invoked command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description -- -j24 -l24
+[0.032s] Invoking command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description
+[0.035s] -- Install configuration: ""
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//launch
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//launch/display.launch.py
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//src
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//src/description
+[0.035s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//src/description/tinker.urdf.xacro
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//rviz
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//rviz/urdf_config.rviz
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//mesh
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description//mesh/tinker_base.stl
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/package_run_dependencies/tinker_description
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/parent_prefix_path/tinker_description
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/ament_prefix_path.sh
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/ament_prefix_path.dsv
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/path.sh
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/environment/path.dsv
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.bash
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.sh
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.zsh
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/local_setup.dsv
+[0.035s] -- Installing: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/package.dsv
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/ament_index/resource_index/packages/tinker_description
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/cmake/tinker_descriptionConfig.cmake
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/cmake/tinker_descriptionConfig-version.cmake
+[0.035s] -- Up-to-date: /home/wbc/Projects/tinker_git_repo/tk23_ws/install/tinker_description/share/tinker_description/package.xml
+[0.036s] Invoked command in '/home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/wbc/Projects/tinker_git_repo/tk23_ws/build/tinker_description
