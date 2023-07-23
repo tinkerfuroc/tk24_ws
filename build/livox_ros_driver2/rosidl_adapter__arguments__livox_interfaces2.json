@@ -1,7 +1,0 @@
-{
-  "package_name": "livox_ros_driver2",
-  "non_idl_tuples": [
-    "/home/wbc/Projects/tinker_git_repo/tk23_ws/src/livox_driver:msg/CustomPoint.msg",
-    "/home/wbc/Projects/tinker_git_repo/tk23_ws/src/livox_driver:msg/CustomMsg.msg"
-  ]
-}
