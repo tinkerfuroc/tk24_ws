@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <chrono>
+#include <functional>
 
 #include "geometry_msgs/msg/twist.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -15,7 +17,8 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include "std_msgs/msg/float64_multi_array.hpp"
 
-class Chassis{
+
+class Chassis : public rclcpp::Node{
 public:
     Chassis();
     ~Chassis();
