@@ -51,11 +51,10 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
 
     for (size_t i = 0; i < info_.joints.size(); i++) {
         motor_ids_[i] = (uint8_t)std::stoi(info_.joints[i].parameters["motor_id"]);
-        motors_.emplace_back(Motor(MOTOR_CHASSIS_ID_START + motor_ids_[i], &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER))
-        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %d", info_.joints[i].name.c_str(), motor_ids_[i]);
+        motors_.emplace_back(Motor(MOTOR_CHASSIS_ID_START + motor_ids_[i], &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER));
+        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %ld", info_.joints[i].name.c_str(), motor_ids_[i]);
     }
 
-    motor = new Motor(MOTOR_CHASSIS_ID_START + i, &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER);
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -115,7 +114,7 @@ hardware_interface::CallbackReturn MotorInterface::on_activate(const rclcpp_life
         }
         velocity_commands_saved_[i] = velocity_commands_[i];
     }
-    for (int i = 0; i < info_.joints.size(); i++) motors[i]->update();
+    for (int i = 0; i < info_.joints.size(); i++) motors_[i].update();
 
     RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Chassis motor started");
     return hardware_interface::CallbackReturn::SUCCESS;
@@ -137,7 +136,7 @@ hardware_interface::return_type MotorInterface::read(const rclcpp::Time & time, 
 
         position_states_[i] = motors_[i].getPosition();
         velocity_states_[i] = motors_[i].getVelocity();
-        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Got position %.5f, velocity %.5f for joint %d!", position_states_[i], velocity_states_[i], i);
+        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Got position %.5f, velocity %.5f for joint %ld!", position_states_[i], velocity_states_[i], i);
     }
     
     return hardware_interface::return_type::OK;
@@ -151,7 +150,7 @@ hardware_interface::return_type MotorInterface::write(const rclcpp::Time & time,
 
             RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor velocity changed: %.5f", velocity_commands_[i]);
             // Send the motor command
-            motors_[i]->Setpoint = velocity_commands_[i];
+            motors_[i].Setpoint = velocity_commands_[i];
 
             // Store the current velocity
             velocity_commands_saved_[i] = velocity_commands_[i];

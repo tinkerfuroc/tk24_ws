@@ -8,7 +8,7 @@ Motor::Motor(int _ID, const MotorPreset *_Preset, MotorParamter _Paramter)
 	Paramter = _Paramter;
 
 	//Initialize Time
-	last_looptime = rclcpp::Time(0);
+	last_looptime = rclcpp::Clock().now();
 
 	//Initialize Setpoint
 	Setpoint = 0;
@@ -54,16 +54,10 @@ double Motor::getPosition()
 
 void Motor::update()
 {
-	if (last_looptime.isZero())
-	{
-		//Return at zero start time
-		last_looptime = rclcpp::Time::now();
-		return;
-	}
 
 	//get Time
-	double dt = (rclcpp::Time::now() - last_looptime).toSec();
-	last_looptime = rclcpp::Time::now();
+	double dt = (rclcpp::Clock().now() - last_looptime).seconds();
+	last_looptime = rclcpp::Clock().now();
 
 	if (!dt)
 	{
