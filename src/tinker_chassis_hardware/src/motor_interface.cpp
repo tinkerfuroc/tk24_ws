@@ -52,7 +52,7 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
     for (size_t i = 0; i < info_.joints.size(); i++) {
         motor_ids_[i] = (uint8_t)std::stoi(info_.joints[i].parameters["motor_id"]);
         motors_.emplace_back(Motor(MOTOR_CHASSIS_ID_START + motor_ids_[i], &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER));
-        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %ld", info_.joints[i].name.c_str(), motor_ids_[i]);
+        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %d", info_.joints[i].name.c_str(), motor_ids_[i]);
     }
 
     return hardware_interface::CallbackReturn::SUCCESS;
@@ -138,7 +138,6 @@ hardware_interface::return_type MotorInterface::read(const rclcpp::Time & time, 
         velocity_states_[i] = motors_[i].getVelocity();
         RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Got position %.5f, velocity %.5f for joint %ld!", position_states_[i], velocity_states_[i], i);
     }
-    
     return hardware_interface::return_type::OK;
 }
 
@@ -157,7 +156,6 @@ hardware_interface::return_type MotorInterface::write(const rclcpp::Time & time,
             motors_[i].update();
         }
     }
-    
     return hardware_interface::return_type::OK;
 }
 

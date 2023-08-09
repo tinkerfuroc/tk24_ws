@@ -1,0 +1,10 @@
+<library path="tinker_chassis_controller">
+  <class name="tinker_chassis_controller/TinkerChassisController"
+    type="tinker_chassis_controller::TinkerChassisController"
+    base_class_type="controller_interface::ControllerInterface"
+  >
+    <description>
+      Chassis controller for tinker.
+    </description>
+  </class>
+</library>
