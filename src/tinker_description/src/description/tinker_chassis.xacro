@@ -4,7 +4,7 @@
   
     <ros2_control name="tinker" type="system">
         <hardware>
-          <plugin>tinker_chassis_controller/TinkerChassisController</plugin>
+          <plugin>tinker_chassis_hardware/MotorInterface</plugin>
         </hardware>
         <joint name="fl_wheel_joint">
           <command_interface name="velocity" />

@@ -18,8 +18,7 @@ namespace tinker_motor
             std::vector<double> velocity_commands_saved_;
             std::vector<Motor> motors_;
         public:
-            MotorInterface(/* args */);
-            ~MotorInterface();
+            RCLCPP_SHARED_PTR_DEFINITIONS(MotorInterface)
 
             virtual hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & hardware_info) override;
 
