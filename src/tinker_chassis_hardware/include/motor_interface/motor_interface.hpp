@@ -11,6 +11,7 @@ namespace tinker_motor
      {
         private:
             std::vector<uint8_t> motor_ids_;
+            std::vector<double> kps_, kis_, kds_;
             std::vector<double> position_states_;
             std::vector<double> velocity_states_;
             std::vector<double> velocity_commands_;

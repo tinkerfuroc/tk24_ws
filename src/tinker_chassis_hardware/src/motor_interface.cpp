@@ -15,6 +15,9 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
     }
 
     motor_ids_.resize(info_.joints.size());
+    kps_.resize(info_.joints.size());
+    kds_.resize(info_.joints.size());
+    kis_.resize(info_.joints.size());
     position_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     velocity_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     velocity_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -23,7 +26,19 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
     for (hardware_interface::ComponentInfo & joint : info_.joints)
     {
         if (joint.parameters["motor_id"].empty()) {
-            RCLCPP_FATAL(rclcpp::get_logger("MotorInterface"), "Motor id not defined for join %s", joint.name.c_str());
+            RCLCPP_FATAL(rclcpp::get_logger("MotorInterface"), "Motor id not defined for joint %s", joint.name.c_str());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (joint.parameters["kp"].empty()) {
+            RCLCPP_FATAL(rclcpp::get_logger("MotorInterface"), "No kp defined for joint %s", joint.name.c_str());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (joint.parameters["ki"].empty()) {
+            RCLCPP_FATAL(rclcpp::get_logger("MotorInterface"), "No ki defined for joint %s", joint.name.c_str());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (joint.parameters["kd"].empty()) {
+            RCLCPP_FATAL(rclcpp::get_logger("MotorInterface"), "No kd defined for joint %s", joint.name.c_str());
             return hardware_interface::CallbackReturn::ERROR;
         }
         if (joint.command_interfaces.size() != 1) {
@@ -52,6 +67,7 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
     for (size_t i = 0; i < info_.joints.size(); i++) {
         motor_ids_[i] = (uint8_t)std::stoi(info_.joints[i].parameters["motor_id"]);
         motors_.emplace_back(Motor(MOTOR_CHASSIS_ID_START + motor_ids_[i], &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER));
+        motors_[i].setCoefficients(kps_[i], kis_[i], kds_[i], 0, 1000, 1);
         RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %d", info_.joints[i].name.c_str(), motor_ids_[i]);
     }
 
