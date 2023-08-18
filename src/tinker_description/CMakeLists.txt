@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(DIRECTORY
-  launch src rviz mesh
+  launch src rviz mesh config
   DESTINATION share/${PROJECT_NAME}/
 )
 

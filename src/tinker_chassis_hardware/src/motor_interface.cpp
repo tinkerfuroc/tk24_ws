@@ -66,6 +66,9 @@ hardware_interface::CallbackReturn MotorInterface::on_init(const hardware_interf
 
     for (size_t i = 0; i < info_.joints.size(); i++) {
         motor_ids_[i] = (uint8_t)std::stoi(info_.joints[i].parameters["motor_id"]);
+        kps_[i] = std::stof(info_.joints[i].parameters["kp"]); 
+        kis_[i] = std::stof(info_.joints[i].parameters["ki"]); 
+        kds_[i] = std::stof(info_.joints[i].parameters["kd"]); 
         motors_.emplace_back(Motor(MOTOR_CHASSIS_ID_START + motor_ids_[i], &MOTOR_CHASSIS, MOTOR_CHASSIS_PARAMTER));
         motors_[i].setCoefficients(kps_[i], kis_[i], kds_[i], 0, 1000, 1);
         RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "%s mapped to motor %d", info_.joints[i].name.c_str(), motor_ids_[i]);
