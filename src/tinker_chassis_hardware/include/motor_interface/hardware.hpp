@@ -90,6 +90,7 @@ class RobotHardware
 //////////////////////////////Global Hardware Handle////////////////////////////////////
 
 RobotHardware *Hardware();
+
 void ReleaseHardware();
 
 #endif

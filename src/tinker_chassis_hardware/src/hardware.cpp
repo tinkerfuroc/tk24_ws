@@ -107,13 +107,13 @@ void RobotHardware::CAN_Motor_Update()
     for (int id = 0; id < std::min(4, HW_MOTOR_COUNT); id++)
     {
         int16_t power = (int16_t)motors[id].power;
-
         frame.data[2 * id] = (uint8_t)(power >> 8);
         frame.data[2 * id + 1] = (uint8_t)(power);
     }
 
-    if (can0_adapter.is_open()) can0_adapter.transmit(&frame);
-
+    if (can0_adapter.is_open()) {
+        can0_adapter.transmit(&frame);
+    }
     //CAN0 Transmit Frame 2
     if (HW_MOTOR_COUNT > 4)
     {
@@ -123,11 +123,13 @@ void RobotHardware::CAN_Motor_Update()
         for (int id = 4; id < std::min(8, HW_MOTOR_COUNT); id++)
         {
             int16_t power = (int16_t)motors[id].power;
-
             frame.data[2 * (id - 4)] = (uint8_t)(power >> 8);
             frame.data[2 * (id - 4) + 1] = (uint8_t)(power);
         }
 
-        if (can0_adapter.is_open()) can0_adapter.transmit(&frame);
+        if (can0_adapter.is_open()) {
+            can0_adapter.transmit(&frame);
+            RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Data transmitted");
+        }
     }
 }

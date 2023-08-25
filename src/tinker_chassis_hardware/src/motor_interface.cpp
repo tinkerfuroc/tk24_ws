@@ -156,7 +156,7 @@ hardware_interface::return_type MotorInterface::read(const rclcpp::Time & time, 
         position_states_[i] = motors_[i].getPosition();
         velocity_states_[i] = motors_[i].getVelocity();
         // Important Debug
-        // RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Got position %.5f, velocity %.5f for joint %ld!", position_states_[i], velocity_states_[i], i);
+        RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Got position %.5f, velocity %.5f for joint %ld!", position_states_[i], velocity_states_[i], i);
     }
     return hardware_interface::return_type::OK;
 }

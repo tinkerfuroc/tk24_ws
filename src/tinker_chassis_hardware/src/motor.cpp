@@ -65,25 +65,6 @@ void Motor::update()
 		return;
 	}
 
-	//Position Calibrate
-	if(isCalibrating) {
-		Hardware()->motors[ID].power = (CalibrateDuration < (MOTOR_CALIBRATION_DURATION / 2.0)) ? (Paramter.CalibrateCurrent * Preset->PWMMaxValue) : 0.0;
-
-		if(getVelocity() < MOTOR_CALIBRATION_THRESHOLD) {
-			CalibrateDuration += dt;
-		}
-
-		if(CalibrateDuration > MOTOR_CALIBRATION_DURATION) {
-			isCalibrating = false;
-
-			CalibrationValue = getPosition();
-
-			RCLCPP_INFO(rclcpp::get_logger("Motor_init"),"Motor %d Calibration OK!", ID);
-		}
-
-		return;
-	}
-
 	//PID Closeloop
 	//Reference: https://bitbucket.org/AndyZe/pid
 	double c_ = 1.0;
@@ -140,6 +121,8 @@ void Motor::update()
 		out_power = pwm_max_value;
 	if (out_power < -pwm_max_value)
 		out_power = -pwm_max_value;
-
+	RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor output: %d", out_power);
+	RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "ID: %d", ID);
 	Hardware()->motors[ID].power = out_power;
+	Hardware()->update();
 }
