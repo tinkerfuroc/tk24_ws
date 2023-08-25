@@ -1,13 +1,19 @@
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include "lifecycle_msgs/msg/state.hpp"
 
 #include "tinker_chassis_controller/tinker_chassis_controller.hpp"
 
 using namespace tinker_chassis_controller;
-
+using lifecycle_msgs::msg::State;
+namespace
+{
+constexpr auto DEFAULT_COMMAND_TOPIC = "/cmd_vel";
+constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel_unstamped";
+}  // namespace
 TinkerChassisController::TinkerChassisController()
     : controller_interface::ControllerInterface()
-    , velocity_command_subsciption_(nullptr)
+    , velocity_command_subscriber_(nullptr)
     , velocity_command_ptr_(nullptr)
 {
 
@@ -52,15 +58,32 @@ controller_interface::CallbackReturn TinkerChassisController::on_init()
 
 controller_interface::return_type TinkerChassisController::update(const rclcpp::Time & time, const rclcpp::Duration & period)
 {
-    // Get the last velocity command
-    auto velocity_command = velocity_command_ptr_.readFromRT();
-    if (!velocity_command || !(*velocity_command)) {
+    auto logger = get_node()->get_logger();
+    if (get_state().id() == State::PRIMARY_STATE_INACTIVE)
+    {
         return controller_interface::return_type::OK;
     }
+    std::shared_ptr<Twist> last_command_msg;
+    received_velocity_msg_ptr_.get(last_command_msg);
+    if (last_command_msg == nullptr)
+    {
+      RCLCPP_WARN(logger, "Velocity message received was a nullptr.");
+      return controller_interface::return_type::ERROR;
+    }
 
+    const auto age_of_last_command = time - last_command_msg->header.stamp;
+    // Brake if cmd_vel has timeout, override the stored command
+    if (age_of_last_command > cmd_vel_timeout_)
+    {
+      last_command_msg->twist.linear.x = 0.0;
+      last_command_msg->twist.angular.z = 0.0;
+    }
+    Twist command = *last_command_msg;
     // Calculate the wheel velocity
     // See: http://robotsforroboticists.com/drive-kinematics/
-    const auto twist = (*velocity_command)->twist;
+    const auto twist = command.twist;
+
+    RCLCPP_INFO(logger, "velocity message received:x: %lf, y:%lf", twist.linear.x, twist.linear.y);
     double fl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x - twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double fr_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
@@ -82,6 +105,8 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     fr_wheel_joint_name_ = get_node()->get_parameter("fr_wheel_joint_name").as_string();
     rl_wheel_joint_name_ = get_node()->get_parameter("rl_wheel_joint_name").as_string();
     rr_wheel_joint_name_ = get_node()->get_parameter("rr_wheel_joint_name").as_string();
+    // Change message type of stamped or not here
+    // **** //
     if (fl_wheel_joint_name_.empty()) {
         RCLCPP_ERROR(get_node()->get_logger(), "'fl_wheel_joint_name' parameter was empty");
         return controller_interface::CallbackReturn::ERROR;
@@ -125,10 +150,59 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
         return controller_interface::CallbackReturn::ERROR;
     }
 
-    velocity_command_subsciption_ = get_node()->create_subscription<Twist>("/cmd_vel", rclcpp::SystemDefaultsQoS(), [this](const Twist::SharedPtr twist)
+    const Twist empty_twist;
+    received_velocity_msg_ptr_.set(std::make_shared<Twist>(empty_twist));
+
+    // Fill last two commands with default constructed commands
+    previous_commands_.emplace(empty_twist);
+    previous_commands_.emplace(empty_twist);
+
+    // initialize command subscriber
+    if (use_stamped_vel_)
     {
-        velocity_command_ptr_.writeFromNonRT(twist);
-    });
+      velocity_command_subscriber_ = get_node()->create_subscription<Twist>(
+        DEFAULT_COMMAND_TOPIC, rclcpp::SystemDefaultsQoS(),
+        [this](const std::shared_ptr<Twist> msg) -> void
+        {
+          if (!subscriber_is_active_)
+          {
+            RCLCPP_WARN(
+              get_node()->get_logger(), "Can't accept new commands. subscriber is inactive");
+            return;
+          }
+          if ((msg->header.stamp.sec == 0) && (msg->header.stamp.nanosec == 0))
+          {
+            RCLCPP_WARN_ONCE(
+              get_node()->get_logger(),
+              "Received TwistStamped with zero timestamp, setting it to current "
+              "time, this message will only be shown once");
+            msg->header.stamp = get_node()->get_clock()->now();
+          }
+          received_velocity_msg_ptr_.set(std::move(msg));
+        });
+    }
+    else
+    {
+      velocity_command_unstamped_subscriber_ =
+        get_node()->create_subscription<geometry_msgs::msg::Twist>(
+          DEFAULT_COMMAND_UNSTAMPED_TOPIC, rclcpp::SystemDefaultsQoS(),
+          [this](const std::shared_ptr<geometry_msgs::msg::Twist> msg) -> void
+          {
+            if (!subscriber_is_active_)
+            {
+              RCLCPP_WARN(
+                get_node()->get_logger(), "Can't accept new commands. subscriber is inactive");
+              return;
+            }
+
+            // Write fake header in the stored stamped command
+            std::shared_ptr<Twist> twist_stamped;
+            received_velocity_msg_ptr_.get(twist_stamped);
+            twist_stamped->twist = *msg;
+            twist_stamped->header.stamp = get_node()->get_clock()->now();
+          });
+    }
+    
 
     return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -219,7 +293,7 @@ std::shared_ptr<ChassisMotor> TinkerChassisController::get_wheel(const std::stri
 bool TinkerChassisController::reset()
 {
     subscriber_is_active_ = false;
-    velocity_command_subsciption_.reset();
+    velocity_command_subscriber_.reset();
 
     fl_wheel_.reset();
     fr_wheel_.reset();

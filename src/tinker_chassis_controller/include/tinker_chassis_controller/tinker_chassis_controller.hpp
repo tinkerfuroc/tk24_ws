@@ -5,8 +5,11 @@
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
 #include <realtime_tools/realtime_buffer.h>
+#include "realtime_tools/realtime_box.h"
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <string>
+#include <chrono>
+#include <queue>
 
 #include "tinker_chassis_controller/chassis_motor.hpp"
 
@@ -58,8 +61,11 @@ namespace tinker_chassis_controller
         bool reset();
 
     protected:
-        rclcpp::Subscription<Twist>::SharedPtr velocity_command_subsciption_;
+        rclcpp::Subscription<Twist>::SharedPtr velocity_command_subscriber_ = nullptr;
+        rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr
+            velocity_command_unstamped_subscriber_ = nullptr;
         realtime_tools::RealtimeBuffer<std::shared_ptr<Twist>> velocity_command_ptr_;
+        realtime_tools::RealtimeBox<std::shared_ptr<Twist>> received_velocity_msg_ptr_{nullptr};
         std::shared_ptr<ChassisMotor> fl_wheel_;
         std::shared_ptr<ChassisMotor> fr_wheel_;
         std::shared_ptr<ChassisMotor> rl_wheel_;
@@ -76,7 +82,10 @@ namespace tinker_chassis_controller
         double wheel_separation_width_;
         double wheel_separation_length_;
         bool subscriber_is_active_;
-
+        bool use_stamped_vel_ = true;
+        std::chrono::milliseconds cmd_vel_timeout_{500};
+        
+        std::queue<Twist> previous_commands_;  // last two commands
     };
 }
 
