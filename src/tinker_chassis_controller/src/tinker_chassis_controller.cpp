@@ -9,7 +9,7 @@ using lifecycle_msgs::msg::State;
 namespace
 {
 constexpr auto DEFAULT_COMMAND_TOPIC = "/cmd_vel";
-constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel_unstamped";
+constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel";
 }  // namespace
 TinkerChassisController::TinkerChassisController()
     : controller_interface::ControllerInterface()
@@ -75,15 +75,15 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
     // Brake if cmd_vel has timeout, override the stored command
     if (age_of_last_command > cmd_vel_timeout_)
     {
-      last_command_msg->twist.linear.x = 0.0;
-      last_command_msg->twist.angular.z = 0.0;
+      // last_command_msg->twist.linear.x = 0.0;
+      // last_command_msg->twist.angular.z = 0.0;
     }
     Twist command = *last_command_msg;
     // Calculate the wheel velocity
     // See: http://robotsforroboticists.com/drive-kinematics/
     const auto twist = command.twist;
 
-    RCLCPP_INFO(logger, "velocity message received:x: %lf, y:%lf", twist.linear.x, twist.linear.y);
+    // RCLCPP_INFO(logger, "Velocity message received:x:%lf, y%lf", twist.linear.x, twist.linear.y);
     double fl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x - twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double fr_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
@@ -292,7 +292,7 @@ std::shared_ptr<ChassisMotor> TinkerChassisController::get_wheel(const std::stri
 
 bool TinkerChassisController::reset()
 {
-    subscriber_is_active_ = false;
+    subscriber_is_active_ = true;
     velocity_command_subscriber_.reset();
 
     fl_wheel_.reset();

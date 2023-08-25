@@ -82,7 +82,7 @@ namespace tinker_chassis_controller
         double wheel_separation_width_;
         double wheel_separation_length_;
         bool subscriber_is_active_;
-        bool use_stamped_vel_ = true;
+        bool use_stamped_vel_ = false;
         std::chrono::milliseconds cmd_vel_timeout_{500};
         
         std::queue<Twist> previous_commands_;  // last two commands
