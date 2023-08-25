@@ -99,6 +99,10 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
         return controller_interface::CallbackReturn::ERROR;
     }
 
+    RCLCPP_INFO(get_node()->get_logger(), "'fl_wheel_joint_name' parameter : %s", fl_wheel_joint_name_.c_str());
+    RCLCPP_INFO(get_node()->get_logger(), "'fr_wheel_joint_name' parameter : %s", fr_wheel_joint_name_.c_str());
+    RCLCPP_INFO(get_node()->get_logger(), "'rl_wheel_joint_name' parameter : %s", rl_wheel_joint_name_.c_str());
+    RCLCPP_INFO(get_node()->get_logger(), "'rr_wheel_joint_name' parameter : %s", rr_wheel_joint_name_.c_str());
     wheel_radius_ = get_node()->get_parameter("wheel_radius").as_double();
     wheel_distance_width_ = get_node()->get_parameter("wheel_distance.width").as_double();
     wheel_distance_length_ = get_node()->get_parameter("wheel_distance.length").as_double();
@@ -173,10 +177,12 @@ controller_interface::CallbackReturn TinkerChassisController::on_shutdown(const 
 std::shared_ptr<ChassisMotor> TinkerChassisController::get_wheel(const std::string & wheel_joint_name)
 {
     // Lookup the position state interface
-    const auto position_state = std::find_if(state_interfaces_.cbegin(), state_interfaces_.cend(), [&wheel_joint_name](const hardware_interface::LoanedStateInterface & interface)
-    {
-        return interface.get_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_POSITION;
-    });
+    const auto position_state = std::find_if(state_interfaces_.cbegin(), state_interfaces_.cend(), 
+        [&wheel_joint_name](const hardware_interface::LoanedStateInterface & interface)
+        {
+            return interface.get_prefix_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_POSITION;
+        }
+    );
     if (position_state == state_interfaces_.cend()) {
         RCLCPP_ERROR(get_node()->get_logger(), "%s position state interface not found", wheel_joint_name.c_str());
         return nullptr;
@@ -185,7 +191,7 @@ std::shared_ptr<ChassisMotor> TinkerChassisController::get_wheel(const std::stri
     // Lookup the velocity state interface
     const auto velocity_state = std::find_if(state_interfaces_.cbegin(), state_interfaces_.cend(), [&wheel_joint_name](const hardware_interface::LoanedStateInterface & interface)
     {
-        return interface.get_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_VELOCITY;
+        return interface.get_prefix_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_VELOCITY;
     });
     if (velocity_state == state_interfaces_.cend()) {
         RCLCPP_ERROR(get_node()->get_logger(), "%s velocity state interface not found", wheel_joint_name.c_str());
@@ -195,7 +201,7 @@ std::shared_ptr<ChassisMotor> TinkerChassisController::get_wheel(const std::stri
     // Lookup the velocity command interface
     const auto velocity_command = std::find_if(command_interfaces_.begin(), command_interfaces_.end(), [&wheel_joint_name](const hardware_interface::LoanedCommandInterface & interface)
     {
-        return interface.get_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_VELOCITY;
+        return interface.get_prefix_name() == wheel_joint_name && interface.get_interface_name() == hardware_interface::HW_IF_VELOCITY;
     });
     if (velocity_command == command_interfaces_.end()) {
         RCLCPP_ERROR(get_node()->get_logger(), "%s velocity command interface not found", wheel_joint_name.c_str());
