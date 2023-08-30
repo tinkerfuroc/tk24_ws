@@ -3,10 +3,10 @@ The new workspace for 2023-2024
 # Chassis Setup
 Setup usb can communication:
 ```sh
-ip link set can0 type can bitrate 1000000
-ip link set up can0
+sudo chmod +x ./setupcan.sh
+./setupcan.sh
 ```
-Laucnh the interface and controller:
+Launch the interface and controller:
 ```sh
 ros2 launch tinker_chassis_bringup tinker_bringup.launch.py
 ```
