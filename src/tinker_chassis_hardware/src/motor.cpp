@@ -28,8 +28,6 @@ Motor::Motor(int _ID, const MotorPreset *_Preset, MotorParamter _Paramter)
 	isCalibrating = Paramter.DoCalibration;
 	CalibrateDuration = 0;
 	CalibrationValue = 0;
-
-	if(isCalibrating) RCLCPP_INFO(rclcpp::get_logger("Motor_init"),"Motor %d Calibrating...", ID);
 }
 
 void Motor::setCoefficients(double _Kp, double _Ki, double _Kd, double _Kf, double _KmaxI, double _KmaxO)

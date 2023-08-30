@@ -173,9 +173,9 @@ hardware_interface::return_type MotorInterface::write(const rclcpp::Time & time,
 
             // Store the current velocity
             velocity_commands_saved_[i] = velocity_commands_[i];
-            motors_[i].update();
         }
     }
+    motors_[i].update();
     return hardware_interface::return_type::OK;
 }
 
