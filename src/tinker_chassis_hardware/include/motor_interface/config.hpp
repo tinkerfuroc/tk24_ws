@@ -71,7 +71,7 @@ const MotorPreset MOTOR_GM3510 = {
 };
 
 const MotorPreset MOTOR_GM6020_CUSTOM_REDUCER = {
-    30000,
+    10000,
     (1.0 / 60.0) * 2.0 * M_PI / 5.0,
     (1.0 / 8192.0) * 2.0 * M_PI / 5.0
 };
