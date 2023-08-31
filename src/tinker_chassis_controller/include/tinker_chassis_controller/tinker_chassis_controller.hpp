@@ -7,10 +7,11 @@
 #include <realtime_tools/realtime_buffer.h>
 #include "realtime_tools/realtime_box.h"
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
 #include <string>
 #include <chrono>
 #include <queue>
-
+#include <vector>
 #include "tinker_chassis_controller/chassis_motor.hpp"
 
 
@@ -64,6 +65,7 @@ namespace tinker_chassis_controller
         rclcpp::Subscription<Twist>::SharedPtr velocity_command_subscriber_ = nullptr;
         rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr
             velocity_command_unstamped_subscriber_ = nullptr;
+        std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float64MultiArray>> motor_state_publisher_ = nullptr;
         realtime_tools::RealtimeBuffer<std::shared_ptr<Twist>> velocity_command_ptr_;
         realtime_tools::RealtimeBox<std::shared_ptr<Twist>> received_velocity_msg_ptr_{nullptr};
         std::shared_ptr<ChassisMotor> fl_wheel_;
@@ -86,6 +88,8 @@ namespace tinker_chassis_controller
         std::chrono::milliseconds cmd_vel_timeout_{500};
         
         std::queue<Twist> previous_commands_;  // last two commands
+        std::vector<double> debug_data = {0,0,0,0};
+        std_msgs::msg::Float64MultiArray debug_message;
     };
 }
 

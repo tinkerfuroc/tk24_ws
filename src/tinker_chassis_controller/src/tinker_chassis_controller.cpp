@@ -10,6 +10,7 @@ namespace
 {
 constexpr auto DEFAULT_COMMAND_TOPIC = "/cmd_vel";
 constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel";
+constexpr auto DEFAULT_DEBUG_TOPIC = "/motor_state";
 }  // namespace
 TinkerChassisController::TinkerChassisController()
     : controller_interface::ControllerInterface()
@@ -89,6 +90,12 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
     double rl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rr_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x - twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
 
+    debug_data[0] = fl_wheel_velocity;
+    debug_data[1] = fr_wheel_velocity;
+    debug_data[2] = rl_wheel_velocity;
+    debug_data[3] = rr_wheel_velocity;
+    debug_message.data = debug_data;
+    motor_state_publisher_->publish(debug_message);
     fl_wheel_->set_velocity(fl_wheel_velocity);
     fr_wheel_->set_velocity(fr_wheel_velocity);
     rl_wheel_->set_velocity(rl_wheel_velocity);
@@ -203,6 +210,7 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
           });
     }
     
+    motor_state_publisher_ = get_node()->create_publisher<std_msgs::msg::Float64MultiArray>(DEFAULT_DEBUG_TOPIC, rclcpp::SystemDefaultsQoS());
 
     return controller_interface::CallbackReturn::SUCCESS;
 }
