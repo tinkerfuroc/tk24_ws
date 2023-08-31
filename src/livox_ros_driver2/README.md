@@ -1,5 +1,6 @@
 # Livox MID-360 ROS Driver2 for `Humble` only
 
+The `Livox-SDK2` should be installed first: [Livox-SDK2](https://github.com/Livox-SDK/Livox-SDK2/blob/master/README.md)
 Compared with the original package, `build.sh` is deleted so only `humble` is supported. Now the package needn't be compiled independently.
 
 For the original package info and more information about config file, see:

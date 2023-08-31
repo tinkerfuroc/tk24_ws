@@ -175,8 +175,8 @@ if(ROS_EDITION STREQUAL "ROS1")
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
-  install(DIRECTORY launch_ROS1/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch_ROS1
+  install(DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
   )
 
   #---------------------------------------------------------------------------------------
@@ -331,7 +331,7 @@ else(ROS_EDITION STREQUAL "ROS2")
 
   ament_auto_package(INSTALL_TO_SHARE
     config
-    launch_ROS2
+    launch
   )
 
 endif()
