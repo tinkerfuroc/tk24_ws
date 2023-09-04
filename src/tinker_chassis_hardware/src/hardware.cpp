@@ -68,7 +68,7 @@ void RobotHardware::Motor_UpdateOffset(moto_measure_t *ptr, can_frame_t *frame)
         ptr->round_cnt++;
 
     ptr->total_angle = ptr->round_cnt * 8192 + ptr->angle - ptr->offset_angle;
-    RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor speed received");
+    // RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor speed received");
 }
 
 void RobotHardware::CAN0_ReceiveFrame(can_frame_t *frame)

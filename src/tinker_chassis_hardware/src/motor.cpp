@@ -119,8 +119,8 @@ void Motor::update()
 		out_power = pwm_max_value;
 	if (out_power < -pwm_max_value)
 		out_power = -pwm_max_value;
-	RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor output: %d", out_power);
-	RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "ID: %d", ID);
+	// RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor output: %d", out_power);
+	// RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "ID: %d", ID);
 	Hardware()->motors[ID].power = out_power;
 	Hardware()->update();
 }

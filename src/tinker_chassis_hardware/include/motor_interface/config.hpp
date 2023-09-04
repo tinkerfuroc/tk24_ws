@@ -53,7 +53,7 @@ const double MOTOR_CALIBRATION_DURATION  = 1.0;
  * Different Motor Presets
  */
 const MotorPreset MOTOR_M2006 = {
-    10000,                                           //PWM Max Value
+    30000,                                           //PWM Max Value
     (1.0 / 60.0) * 2.0 * M_PI / 36.0,                //RPM To rad/s
     (1.0 / 8192.0) * 2.0 * M_PI / 36.0               //TICK to rad
 };
@@ -70,8 +70,9 @@ const MotorPreset MOTOR_GM3510 = {
     (1.0 / 8192.0) * 2.0 * M_PI
 };
 
+// Chassis motor used now, to change the max value, change this.
 const MotorPreset MOTOR_GM6020_CUSTOM_REDUCER = {
-    10000,
+    30000,
     (1.0 / 60.0) * 2.0 * M_PI / 5.0,
     (1.0 / 8192.0) * 2.0 * M_PI / 5.0
 };
@@ -95,14 +96,6 @@ const MotorParamter MOTOR_PARAMTER_DEFAULT = {
 
 const double CHASSIS_WATCHDOG_TIMEOUT = 1.0;
 
-// Mecanum wheel kinematics
-// Model definition : https://research.ijcaonline.org/volume113/number3/pxc3901586.pdf
-const double CHASSIS_WHEEL_R = 0.076;
-const double CHASSIS_LENGTH_A = 0.45 / 2.0;
-const double CHASSIS_LENGTH_B = 0.42 / 2.0;
-
-// L1 = 42 cm
-// L2 = 45 cm
 
 /*
  * Motion Paramters
