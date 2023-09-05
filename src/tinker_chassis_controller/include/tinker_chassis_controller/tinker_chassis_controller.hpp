@@ -3,16 +3,20 @@
 
 #include <controller_interface/controller_interface.hpp>
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
+#include "nav_msgs/msg/odometry.hpp"
 #include <rclcpp_lifecycle/state.hpp>
 #include <realtime_tools/realtime_buffer.h>
 #include "realtime_tools/realtime_box.h"
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
+#include "realtime_tools/realtime_publisher.h"
+#include "tf2_msgs/msg/tf_message.hpp"
 #include <string>
 #include <chrono>
 #include <queue>
 #include <vector>
 #include "tinker_chassis_controller/chassis_motor.hpp"
+#include "tf2/LinearMath/Quaternion.h"
 
 
 namespace tinker_chassis_controller
@@ -90,6 +94,23 @@ namespace tinker_chassis_controller
         std::queue<Twist> previous_commands_;  // last two commands
         std::vector<double> debug_data = {0,0,0,0};
         std_msgs::msg::Float64MultiArray debug_message;
+
+        // odom
+        Odometry odometry_;
+        std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> odometry_publisher_ = nullptr;
+        std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::msg::Odometry>>
+            realtime_odometry_publisher_ = nullptr;
+        std::shared_ptr<rclcpp::Publisher<tf2_msgs::msg::TFMessage>> odometry_transform_publisher_ = nullptr;
+        std::shared_ptr<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>
+            realtime_odometry_transform_publisher_ = nullptr;
+        size_t velocity_rolling_window_size_;
+        // time stamp
+        rclcpp::Time previous_update_timestamp_{0};
+        // publish rate limiter
+        double publish_rate_ = 50.0;
+        rclcpp::Duration publish_period_ = rclcpp::Duration::from_nanoseconds(0);
+        rclcpp::Time previous_publish_timestamp_{0, 0, RCL_CLOCK_UNINITIALIZED};
+
     };
 }
 

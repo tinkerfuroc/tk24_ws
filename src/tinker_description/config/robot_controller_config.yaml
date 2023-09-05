@@ -18,3 +18,16 @@ tinker_controller:
     wheel_distance:
       width: 0.46
       length: 0.40
+    velocity_rolling_window_size: 10
+
+     # Frames
+    odom_frame_id: odom
+    base_frame_id: base_link
+    pose_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    twist_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    open_loop: true
+    enable_odom_tf: true
+
+    # signals:
+    publish_rate: 200
+

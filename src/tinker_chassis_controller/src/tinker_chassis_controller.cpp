@@ -1,7 +1,7 @@
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include "lifecycle_msgs/msg/state.hpp"
-
+#include "tinker_chassis_controller/odometry.hpp"
 #include "tinker_chassis_controller/tinker_chassis_controller.hpp"
 
 using namespace tinker_chassis_controller;
@@ -11,6 +11,8 @@ namespace
 constexpr auto DEFAULT_COMMAND_TOPIC = "/cmd_vel";
 constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel";
 constexpr auto DEFAULT_DEBUG_TOPIC = "/motor_state";
+constexpr auto DEFAULT_ODOMETRY_TOPIC = "~/odom";
+constexpr auto DEFAULT_TRANSFORM_TOPIC = "/tf";
 }  // namespace
 TinkerChassisController::TinkerChassisController()
     : controller_interface::ControllerInterface()
@@ -101,6 +103,70 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
     rl_wheel_->set_velocity(rl_wheel_velocity);
     rr_wheel_->set_velocity(rr_wheel_velocity);
 
+    // odom
+    if (get_node()->get_parameter("open_loop").as_bool())
+    {
+      odometry_.updateOpenLoop(twist.linear.x,  twist.angular.z, time);
+    }
+    else // Temporariliy not available
+    {
+      double left_feedback_mean = 0.0;
+      double right_feedback_mean = 0.0;
+
+      odometry_.update(left_feedback_mean, right_feedback_mean, time);
+    }
+
+    tf2::Quaternion orientation;
+    orientation.setRPY(0.0, 0.0, odometry_.getHeading());
+
+    bool should_publish = false;
+    try
+    {
+      if (previous_publish_timestamp_ + publish_period_ < time)
+      {
+        previous_publish_timestamp_ += publish_period_;
+        should_publish = true;
+      }
+    }
+    catch (const std::runtime_error &)
+    {
+      // Handle exceptions when the time source changes and initialize publish timestamp
+      previous_publish_timestamp_ = time;
+      should_publish = true;
+    }
+
+    if (should_publish)
+    {
+      if (realtime_odometry_publisher_->trylock())
+      {
+        auto & odometry_message = realtime_odometry_publisher_->msg_;
+        odometry_message.header.stamp = time;
+        odometry_message.pose.pose.position.x = odometry_.getX();
+        odometry_message.pose.pose.position.y = odometry_.getY();
+        odometry_message.pose.pose.orientation.x = orientation.x();
+        odometry_message.pose.pose.orientation.y = orientation.y();
+        odometry_message.pose.pose.orientation.z = orientation.z();
+        odometry_message.pose.pose.orientation.w = orientation.w();
+        odometry_message.twist.twist.linear.x = odometry_.getLinear();
+        odometry_message.twist.twist.angular.z = odometry_.getAngular();
+        realtime_odometry_publisher_->unlockAndPublish();
+      }
+
+      if (get_node()->get_parameter("enable_odom_tf").as_bool() && realtime_odometry_transform_publisher_->trylock())
+      {
+        auto & transform = realtime_odometry_transform_publisher_->msg_.transforms.front();
+        transform.header.stamp = time;
+        transform.transform.translation.x = odometry_.getX();
+        transform.transform.translation.y = odometry_.getY();
+        transform.transform.rotation.x = orientation.x();
+        transform.transform.rotation.y = orientation.y();
+        transform.transform.rotation.z = orientation.z();
+        transform.transform.rotation.w = orientation.w();
+        realtime_odometry_transform_publisher_->unlockAndPublish();
+      }
+    }
+
+
     return controller_interface::return_type::OK;
 }
 
@@ -138,6 +204,7 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     wheel_radius_ = get_node()->get_parameter("wheel_radius").as_double();
     wheel_distance_width_ = get_node()->get_parameter("wheel_distance.width").as_double();
     wheel_distance_length_ = get_node()->get_parameter("wheel_distance.length").as_double();
+    velocity_rolling_window_size_ = get_node()->get_parameter("velocity_rolling_window_size").as_double();
     if (wheel_radius_ <= 0.0) {
         RCLCPP_ERROR(get_node()->get_logger(), "'wheel_radius' parameter cannot be zero or less");
         return controller_interface::CallbackReturn::ERROR;
@@ -150,6 +217,13 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
         RCLCPP_ERROR(get_node()->get_logger(), "'wheel_distance.length' parameter cannot be zero or less");
         return controller_interface::CallbackReturn::ERROR;
     }
+    if (velocity_rolling_window_size_ <= 0.0) {
+        RCLCPP_ERROR(get_node()->get_logger(), "'velocity_rolling_window_size_' parameter cannot be zero or less");
+        return controller_interface::CallbackReturn::ERROR;
+    }
+
+    odometry_.setWheelParams(wheel_distance_width_, wheel_distance_length_, wheel_radius_);
+    odometry_.setVelocityRollingWindowSize(velocity_rolling_window_size_);
     wheel_separation_width_ = wheel_distance_width_ / 2;
     wheel_separation_length_ = wheel_distance_length_ / 2;
 
@@ -211,6 +285,62 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     }
     
     motor_state_publisher_ = get_node()->create_publisher<std_msgs::msg::Float64MultiArray>(DEFAULT_DEBUG_TOPIC, rclcpp::SystemDefaultsQoS());
+
+    // initialize odometry publisher and messasge
+    odometry_publisher_ = get_node()->create_publisher<nav_msgs::msg::Odometry>(
+        DEFAULT_ODOMETRY_TOPIC, rclcpp::SystemDefaultsQoS());
+    realtime_odometry_publisher_ =  std::make_shared<realtime_tools::RealtimePublisher<nav_msgs::msg::Odometry>>(odometry_publisher_);
+    std::string controller_namespace = std::string(get_node()->get_namespace());
+
+    if (controller_namespace == "/")
+    {
+      controller_namespace = "";
+    }
+    else
+    {
+      controller_namespace = controller_namespace + "/";
+    }
+
+    const auto odom_frame_id = controller_namespace + get_node()->get_parameter("odom_frame_id").as_string();
+    const auto base_frame_id = controller_namespace + get_node()->get_parameter("base_frame_id").as_string();
+
+    auto & odometry_message = realtime_odometry_publisher_->msg_;
+    odometry_message.header.frame_id = controller_namespace + odom_frame_id;
+    odometry_message.child_frame_id = controller_namespace + base_frame_id;
+
+    // limit the publication on the topics /odom and /tf
+    publish_rate_ = get_node()->get_parameter("publish_rate").as_double();
+    publish_period_ = rclcpp::Duration::from_seconds(1.0 / publish_rate_);
+
+    // initialize odom values zeros
+    odometry_message.twist =
+      geometry_msgs::msg::TwistWithCovariance(rosidl_runtime_cpp::MessageInitialization::ALL);
+
+    constexpr size_t NUM_DIMENSIONS = 6;
+    std::vector<double> pose_covariance_diagonal = get_node()->get_parameter("pose_covariance_diagonal").as_double_array();
+    std::vector<double> twist_covariance_diagonal = get_node()->get_parameter("twist_covariance_diagonal").as_double_array();
+    for (size_t index = 0; index < 6; ++index)
+    {
+      // 0, 7, 14, 21, 28, 35
+      const size_t diagonal_index = NUM_DIMENSIONS * index + index;
+      odometry_message.pose.covariance[diagonal_index] = pose_covariance_diagonal[index];
+      odometry_message.twist.covariance[diagonal_index] = twist_covariance_diagonal[index];
+    }
+
+    // initialize transform publisher and message
+    odometry_transform_publisher_ = get_node()->create_publisher<tf2_msgs::msg::TFMessage>(
+      DEFAULT_TRANSFORM_TOPIC, rclcpp::SystemDefaultsQoS());
+    realtime_odometry_transform_publisher_ =
+      std::make_shared<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>(
+        odometry_transform_publisher_);
+
+    // keeping track of odom and base_link transforms only
+    auto & odometry_transform_message = realtime_odometry_transform_publisher_->msg_;
+    odometry_transform_message.transforms.resize(1);
+    odometry_transform_message.transforms.front().header.frame_id = odom_frame_id;
+    odometry_transform_message.transforms.front().child_frame_id = base_frame_id;
+
+    previous_update_timestamp_ = get_node()->get_clock()->now();
 
     return controller_interface::CallbackReturn::SUCCESS;
 }

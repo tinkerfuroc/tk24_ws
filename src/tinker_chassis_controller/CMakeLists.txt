@@ -13,12 +13,16 @@ find_package(realtime_tools REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_msgs REQUIRED)
 
 add_library(
   ${PROJECT_NAME}
   SHARED
   src/tinker_chassis_controller.cpp
   src/chassis_motor.cpp
+  src/odometry.cpp
 )
 target_include_directories(
   ${PROJECT_NAME}
@@ -30,9 +34,12 @@ ament_target_dependencies(
   controller_interface
   hardware_interface
   realtime_tools
+  nav_msgs
   pluginlib
   rclcpp
   rclcpp_lifecycle
+  tf2
+  tf2_msgs
 )
 
 pluginlib_export_plugin_description_file(controller_interface tinker_chassis_controller.xml)
