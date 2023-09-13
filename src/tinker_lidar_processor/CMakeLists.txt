@@ -11,6 +11,26 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+add_executable(lidar_decoder src/lidar_decoder.cpp)
+
+target_include_directories(
+  lidar_decoder
+  PRIVATE
+  include
+)
+
+ament_target_dependencies(
+  lidar_decoder
+  rclcpp
+  sensor_msgs
+)
+
+install(TARGETS
+  lidar_decoder
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
