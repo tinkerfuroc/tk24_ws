@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.world": "xml",
+        "functional": "cpp"
+    }
+}
