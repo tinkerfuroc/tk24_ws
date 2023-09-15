@@ -105,16 +105,9 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
 
     // odom
     if (get_node()->get_parameter("open_loop").as_bool())
-    {
       odometry_.updateOpenLoop(twist.linear.x,  twist.angular.z, time);
-    }
-    else // Temporariliy not available
-    {
-      double left_feedback_mean = 0.0;
-      double right_feedback_mean = 0.0;
-
+    else // Use velocity
       odometry_.update(fl_wheel_->get_velocity(), fr_wheel_->get_velocity(), fr_wheel_->get_velocity(), rr_wheel_->get_velocity(), time);
-    }
 
     tf2::Quaternion orientation;
     orientation.setRPY(0.0, 0.0, odometry_.getHeading());
