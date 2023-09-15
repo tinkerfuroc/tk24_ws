@@ -37,7 +37,7 @@ bool Odometry::update(double left_pos, double right_pos, const rclcpp::Time & ti
   }
 
   // Get current wheel joint positions:
-  const double left_wheel_cur_pos =  left_pos * wheel_radius_;
+  const double left_wheel_cur_pos = left_pos * wheel_radius_;
   const double right_wheel_cur_pos = right_pos * wheel_radius_;
 
   // Estimate velocity of wheels using old and current position:
