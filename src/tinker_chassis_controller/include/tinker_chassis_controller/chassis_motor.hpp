@@ -17,6 +17,7 @@ namespace tinker_chassis_controller
                 );
 
             void set_velocity(double value);
+            double get_velocity(void);
 
         private:
             std::reference_wrapper<const hardware_interface::LoanedStateInterface> position_state_;

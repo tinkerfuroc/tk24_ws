@@ -18,3 +18,8 @@ void ChassisMotor::set_velocity(double value)
 {
     velocity_command_.get().set_value(value);
 }
+
+double ChassisMotor::get_velocity(void)
+{
+    velocity_command_.get().get_value();
+}

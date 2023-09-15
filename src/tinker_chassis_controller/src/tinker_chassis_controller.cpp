@@ -113,7 +113,7 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
       double left_feedback_mean = 0.0;
       double right_feedback_mean = 0.0;
 
-      odometry_.update(fl_wheel_velocity, fr_wheel_velocity, fr_wheel_velocity, rr_wheel_velocity, time);
+      odometry_.update(fl_wheel_->get_velocity(), fr_wheel_->get_velocity(), fr_wheel_->get_velocity(), rr_wheel_->get_velocity(), time);
     }
 
     tf2::Quaternion orientation;
