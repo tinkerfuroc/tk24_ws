@@ -20,6 +20,7 @@ public:
   void init(const rclcpp::Time & time);
   bool update(double left_pos, double right_pos, const rclcpp::Time & time);
   bool updateFromVelocity(double left_vel, double right_vel, const rclcpp::Time & time);
+  bool updateFromMecanumVelocity(double left_front_vel, double left_rear_vel, double right_front_vel, double right_rear_vel, const rclcpp::Time & time);
   void updateOpenLoop(double linear, double angular, const rclcpp::Time & time);
   void resetOdometry();
 
@@ -52,8 +53,8 @@ private:
   double angular_;  // [rad/s]
 
   // Wheel kinematic parameters [m]:
-  double wheel_separation_;
-  double wheel_base_;
+  double wheel_separation_; //width of the base
+  double wheel_base_; //length of the base
   double wheel_radius_;
 
   // Previous wheel position/state [rad]:

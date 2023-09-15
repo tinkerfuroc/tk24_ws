@@ -37,7 +37,7 @@ bool Odometry::update(double left_pos, double right_pos, const rclcpp::Time & ti
   }
 
   // Get current wheel joint positions:
-  const double left_wheel_cur_pos = left_pos * wheel_radius_;
+  const double left_wheel_cur_pos =  left_pos * wheel_radius_;
   const double right_wheel_cur_pos = right_pos * wheel_radius_;
 
   // Estimate velocity of wheels using old and current position:
@@ -69,6 +69,31 @@ bool Odometry::updateFromVelocity(double left_vel, double right_vel, const rclcp
 
   // Estimate speeds using a rolling mean to filter them out:
   linear_accumulator_.accumulate(linear / dt);
+  angular_accumulator_.accumulate(angular / dt);
+
+  linear_ = linear_accumulator_.getRollingMean();
+  angular_ = angular_accumulator_.getRollingMean();
+
+  return true;
+}
+
+bool Odometry::updateFromMecanumVelocity(double left_front_vel, double left_rear_vel, double right_front_vel, double right_rear_vel, const rclcpp::Time & time)
+{
+  const double dt = time.seconds() - timestamp_.seconds();
+
+  //Compute linear and angular diff:
+  const double linear_x = (left_front_vel + right_front_vel + left_rear_vel +  right_rear_vel) * 0.25;
+  const double linear_y = (-left_front_vel + right_front_vel + left_rear_vel - right_rear_vel) * 0.25;
+  const double angular = (1 / (2 * (wheel_base_ + wheel_separation_))) * (-left_front_vel + right_front_vel - left_rear_vel + right_rear_vel);
+
+
+  //Integrate odometry:
+  integrateExact(linear_x, angular);
+
+  timestamp_ = time;
+
+  // Estimate speeds using a rolling mean to filter them out:
+  linear_accumulator_.accumulate(linear_x / dt);
   angular_accumulator_.accumulate(angular / dt);
 
   linear_ = linear_accumulator_.getRollingMean();
