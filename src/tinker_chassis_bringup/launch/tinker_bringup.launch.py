@@ -80,11 +80,19 @@ def generate_launch_description():
         )
     )
 
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+    )
+
     return LaunchDescription([
         sim_time_declare_cmd,
         ros2_control_declare_cmd,
         node_robot_state_publisher,
         delayed_controller_manager,
         delayed_tinker_controller_spawner,
-        delayed_joint_broad_spawner
+        delayed_joint_broad_spawner,
+        rviz_node
     ])

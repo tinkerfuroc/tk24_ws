@@ -60,7 +60,7 @@ controller_interface::CallbackReturn TinkerChassisController::on_init()
 }
 
 controller_interface::return_type TinkerChassisController::update(const rclcpp::Time & time, const rclcpp::Duration & period)
-{
+{      
     auto logger = get_node()->get_logger();
     if (get_state().id() == State::PRIMARY_STATE_INACTIVE)
     {
@@ -86,7 +86,7 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
     // See: http://robotsforroboticists.com/drive-kinematics/
     const auto twist = command.twist;
 
-    // RCLCPP_INFO(logger, "Velocity message received:x:%lf, y%lf", twist.linear.x, twist.linear.y);
+    RCLCPP_INFO(logger, "Velocity message received:x:%lf, y%lf", twist.linear.x, twist.linear.y);
     double fl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x - twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double fr_wheel_velocity = -(1 / wheel_radius_) * (twist.linear.x + twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
@@ -197,7 +197,7 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     wheel_radius_ = get_node()->get_parameter("wheel_radius").as_double();
     wheel_distance_width_ = get_node()->get_parameter("wheel_distance.width").as_double();
     wheel_distance_length_ = get_node()->get_parameter("wheel_distance.length").as_double();
-    velocity_rolling_window_size_ = get_node()->get_parameter("velocity_rolling_window_size").as_double();
+    velocity_rolling_window_size_ = get_node()->get_parameter("velocity_rolling_window_size").as_int();
     if (wheel_radius_ <= 0.0) {
         RCLCPP_ERROR(get_node()->get_logger(), "'wheel_radius' parameter cannot be zero or less");
         return controller_interface::CallbackReturn::ERROR;
@@ -223,6 +223,8 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     if (!reset()) {
         return controller_interface::CallbackReturn::ERROR;
     }
+
+    RCLCPP_INFO(get_node()->get_logger(), "Point1");
 
     const Twist empty_twist;
     received_velocity_msg_ptr_.set(std::make_shared<Twist>(empty_twist));
@@ -279,6 +281,7 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     
     motor_state_publisher_ = get_node()->create_publisher<std_msgs::msg::Float64MultiArray>(DEFAULT_DEBUG_TOPIC, rclcpp::SystemDefaultsQoS());
 
+    RCLCPP_INFO(get_node()->get_logger(), "Point2");
     // initialize odometry publisher and messasge
     odometry_publisher_ = get_node()->create_publisher<nav_msgs::msg::Odometry>(
         DEFAULT_ODOMETRY_TOPIC, rclcpp::SystemDefaultsQoS());
