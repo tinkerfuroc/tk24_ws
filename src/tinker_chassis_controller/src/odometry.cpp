@@ -1,4 +1,11 @@
 #include "tinker_chassis_controller/odometry.hpp"
+#include "rclcpp/rclcpp.hpp"
+
+#include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include "lifecycle_msgs/msg/state.hpp"
+#include "tinker_chassis_controller/odometry.hpp"
+#include "tinker_chassis_controller/tinker_chassis_controller.hpp"
 
 namespace tinker_chassis_controller
 {
@@ -30,11 +37,18 @@ void Odometry::init(const rclcpp::Time & time)
 bool Odometry::update(double left_front_vel, double left_rear_vel, double right_front_vel, double right_rear_vel, const rclcpp::Time & time)
 {
   const double dt = time.seconds() - timestamp_.seconds();
-
+  // right_rear_vel = - right_rear_vel;
+  // left_rear_vel = -left_rear_vel;
   //Compute linear and angular diff:
-  const double linear_x = (left_front_vel + right_front_vel + left_rear_vel +  right_rear_vel) * 0.25;
-  const double linear_y = (-left_front_vel + right_front_vel + left_rear_vel - right_rear_vel) * 0.25;
-  const double angular = (1 / (2 * (wheel_base_ + wheel_separation_))) * (-left_front_vel + right_front_vel - left_rear_vel + right_rear_vel);
+  const double linear_x = wheel_radius_ * (left_front_vel + right_front_vel - left_rear_vel -  right_rear_vel) * 0.25;
+  const double linear_y = wheel_radius_ * (-left_front_vel + right_front_vel + left_rear_vel - right_rear_vel) * 0.25;
+  const double angular = (1 / (2 * (wheel_base_ + wheel_separation_))) * (-left_front_vel - right_front_vel - left_rear_vel - right_rear_vel) * wheel_radius_;
+  RCLCPP_INFO(rclcpp::get_logger("Odometry"), "linear x : %lf", linear_x);
+  RCLCPP_INFO(rclcpp::get_logger("Odometry_wheel_radius"), "wheel_radius : %lf", wheel_radius_);
+  RCLCPP_INFO(rclcpp::get_logger("Odometry_lf"), "lf_vel : %lf", left_front_vel);
+  RCLCPP_INFO(rclcpp::get_logger("Odometry_rf"), "rf_vel : %lf", right_front_vel);
+  RCLCPP_INFO(rclcpp::get_logger("Odometry_lr"), "lr_vel : %lf", left_rear_vel);
+  RCLCPP_INFO(rclcpp::get_logger("Odometry_rr"), "rr_vel : %lf", right_rear_vel);
 
 
   //Integrate odometry:

@@ -86,28 +86,39 @@ controller_interface::return_type TinkerChassisController::update(const rclcpp::
     // See: http://robotsforroboticists.com/drive-kinematics/
     const auto twist = command.twist;
 
-    RCLCPP_INFO(logger, "Velocity message received:x:%lf, y%lf", twist.linear.x, twist.linear.y);
     double fl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x - twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double fr_wheel_velocity = -(1 / wheel_radius_) * (twist.linear.x + twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rl_wheel_velocity = (1 / wheel_radius_) * (twist.linear.x + twist.linear.y - (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
     double rr_wheel_velocity = -(1 / wheel_radius_) * (twist.linear.x - twist.linear.y + (wheel_separation_width_ + wheel_separation_length_) * twist.angular.z);
-
+    // RCLCPP_INFO(logger, "fl_wheel: %lf",fl_wheel_velocity);
+    // RCLCPP_INFO(logger, "fl_wheel: %lf",fr_wheel_velocity);
+    // RCLCPP_INFO(logger, "fl_wheel: %lf",rl_wheel_velocity);
+    // RCLCPP_INFO(logger, "fl_wheel: %lf",rr_wheel_velocity);
+    // RCLCPP_INFO(logger, "command: %lf",twist.linear.x);
     debug_data[0] = fl_wheel_velocity;
     debug_data[1] = fr_wheel_velocity;
     debug_data[2] = rl_wheel_velocity;
     debug_data[3] = rr_wheel_velocity;
     debug_message.data = debug_data;
     motor_state_publisher_->publish(debug_message);
+
     fl_wheel_->set_velocity(fl_wheel_velocity);
     fr_wheel_->set_velocity(fr_wheel_velocity);
     rl_wheel_->set_velocity(rl_wheel_velocity);
     rr_wheel_->set_velocity(rr_wheel_velocity);
 
+
     // odom
-    if (get_node()->get_parameter("open_loop").as_bool())
+    if (get_node()->get_parameter("open_loop").as_bool()){
       odometry_.updateOpenLoop(twist.linear.x,  twist.angular.z, time);
-    else // Use velocity
-      odometry_.update(fl_wheel_->get_velocity(), fr_wheel_->get_velocity(), fr_wheel_->get_velocity(), rr_wheel_->get_velocity(), time);
+    }
+    else { // Use velocity 
+      // RCLCPP_INFO(logger, "fl_wheel: %lf",fl_wheel_->get_velocity());
+      // RCLCPP_INFO(logger, "fl_wheel: %lf",fr_wheel_->get_velocity());
+      // RCLCPP_INFO(logger, "fl_wheel: %lf",rl_wheel_->get_velocity());
+      // RCLCPP_INFO(logger, "fl_wheel: %lf",rr_wheel_->get_velocity());
+      odometry_.update(fl_wheel_->get_velocity(), fr_wheel_->get_velocity(), rl_wheel_->get_velocity(), rr_wheel_->get_velocity(), time);
+    }
 
     tf2::Quaternion orientation;
     orientation.setRPY(0.0, 0.0, odometry_.getHeading());
@@ -224,8 +235,6 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
         return controller_interface::CallbackReturn::ERROR;
     }
 
-    RCLCPP_INFO(get_node()->get_logger(), "Point1");
-
     const Twist empty_twist;
     received_velocity_msg_ptr_.set(std::make_shared<Twist>(empty_twist));
 
@@ -281,7 +290,6 @@ controller_interface::CallbackReturn TinkerChassisController::on_configure(const
     
     motor_state_publisher_ = get_node()->create_publisher<std_msgs::msg::Float64MultiArray>(DEFAULT_DEBUG_TOPIC, rclcpp::SystemDefaultsQoS());
 
-    RCLCPP_INFO(get_node()->get_logger(), "Point2");
     // initialize odometry publisher and messasge
     odometry_publisher_ = get_node()->create_publisher<nav_msgs::msg::Odometry>(
         DEFAULT_ODOMETRY_TOPIC, rclcpp::SystemDefaultsQoS());

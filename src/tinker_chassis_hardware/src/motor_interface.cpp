@@ -167,7 +167,7 @@ hardware_interface::return_type MotorInterface::write(const rclcpp::Time & time,
         // Only send motor commands if the velocity changed
         if (velocity_commands_[i] != velocity_commands_saved_[i]) {
 
-            RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor velocity changed: %.5f", velocity_commands_[i]);
+            // RCLCPP_INFO(rclcpp::get_logger("MotorInterface"), "Motor velocity changed: %.5f", velocity_commands_[i]);
             // Send the motor command
             motors_[i].Setpoint = velocity_commands_[i];
 
