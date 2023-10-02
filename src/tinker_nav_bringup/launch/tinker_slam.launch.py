@@ -85,5 +85,13 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(lidar_launch_dir, 'msg_MID360_launch.py'))
         )
-    nodes = [lidar_bringup_cmd, chassis_bringup_cmd, robot_localization_node, start_async_slam_toolbox_node]
+
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen'
+    )
+    
+    nodes = [rviz_node, lidar_bringup_cmd, chassis_bringup_cmd, robot_localization_node, start_async_slam_toolbox_node]
     return LaunchDescription(declared_arguments +  nodes)
