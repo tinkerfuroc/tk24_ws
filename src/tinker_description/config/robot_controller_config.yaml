@@ -14,10 +14,10 @@ tinker_controller:
     fr_wheel_joint_name: fr_wheel_joint
     rl_wheel_joint_name: rl_wheel_joint
     rr_wheel_joint_name: rr_wheel_joint
-    wheel_radius: 0.03
+    wheel_radius: 0.075
     wheel_distance:
-      width: 0.46
-      length: 0.40
+      width: 0.42
+      length: 0.52
     velocity_rolling_window_size: 10
 
      # Frames
