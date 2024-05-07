@@ -1,0 +1,9 @@
+std_msgs/Header header
+float32 left_p1_x
+float32 left_p1_y
+float32 left_p2_x
+float32 left_p2_y
+float32 right_p1_x
+float32 right_p1_y
+float32 right_p2_x
+float32 right_p2_y
